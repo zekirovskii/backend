@@ -81,6 +81,46 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Diagnostic endpoint - EKLE
+app.get('/api/diag', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const dbStatus = mongoose.connection.readyState;
+    
+    let dbStatusText = 'Unknown';
+    switch(dbStatus) {
+      case 0: dbStatusText = 'Disconnected'; break;
+      case 1: dbStatusText = 'Connected'; break;
+      case 2: dbStatusText = 'Connecting'; break;
+      case 3: dbStatusText = 'Disconnecting'; break;
+    }
+
+    res.json({
+      status: 'OK',
+      message: 'Diagnostic endpoint',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'production',
+      runtime: 'nodejs',
+      database: {
+        status: dbStatusText,
+        readyState: dbStatus,
+        host: mongoose.connection.host || 'Not connected',
+        name: mongoose.connection.name || 'Not connected'
+      },
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      ipv4: 'Forced via family: 4'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'ERROR',
+      message: 'Diagnostic failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({

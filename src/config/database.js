@@ -28,7 +28,8 @@ const connectDB = async () => {
       const opts = {
         serverSelectionTimeoutMS: 10000, // 10 saniye timeout
         socketTimeoutMS: 45000, // 45 saniye socket timeout
-        bufferCommands: false
+        bufferCommands: false,
+        family: 4 // IPv4 kullanmaya zorla - Vercel için kritik!
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
@@ -67,8 +68,8 @@ const connectDB = async () => {
     // Vercel için özel hata mesajları
     if (error.name === 'MongooseServerSelectionError') {
       console.error('🌐 Server Selection Error:');
-      console.error('   - Check IP whitelist in MongoDB Atlas');
-      console.error('   - Verify network connectivity');
+      console.error('   - IPv6 connection issue detected');
+      console.error('   - Forced IPv4 should resolve this');
     }
     
     if (error.name === 'MongooseAuthenticationError') {
