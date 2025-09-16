@@ -15,8 +15,8 @@ const connectDB = async () => {
       useUnifiedTopology: true,
       serverSelectionTimeoutMS: 10000, // 10 saniye timeout
       socketTimeoutMS: 45000, // 45 saniye socket timeout
-      bufferCommands: false,
-      bufferMaxEntries: 0
+      bufferCommands: false
+      // bufferMaxEntries kaldırıldı - yeni Mongoose versiyonlarında desteklenmiyor
     });
 
     console.log(`📦 MongoDB Connected: ${conn.connection.host}`);
