@@ -28,14 +28,20 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// CORS configuration - En agresif ayarlar
-app.use(cors({
-  origin: true, // Tüm origin'lere izin ver
+// CORS configuration - Frontend URL'ini güncelleyin
+const corsOptions = {
+  origin: [
+    'http://localhost:3000', 
+    'http://127.0.0.1:3000',
+    'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app' // Frontend URL'i ekleyin
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   exposedHeaders: ['Content-Length', 'X-Foo', 'X-Bar']
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Preflight requests için
 app.options('*', cors());
