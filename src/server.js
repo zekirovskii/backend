@@ -1,28 +1,31 @@
 const express = require('express');
-const cors = require('cors');
 require('dotenv').config();
 
+// MongoDB bağlantısını ekleyelim
+const connectDB = require('./config/database');
+
 const app = express();
-const PORT = process.env.PORT || 5001;
 
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
-// CORS configuration
-app.use(cors({
-  origin: true, // Tüm origin'lere izin ver
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With']
-}));
+// MongoDB bağlantısını başlat
+connectDB();
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// CORS
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
 
-// Health check endpoint - MongoDB olmadan
+// Body parsing
+app.use(express.json());
+
+// Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
+  res.json({
     status: 'OK',
     message: 'Backend API is running',
     timestamp: new Date().toISOString(),
@@ -40,19 +43,19 @@ app.get('/', (req, res) => {
   });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   res.status(500).json({
     status: 'error',
-    message: 'Something went wrong!',
-    error: err.message
+    message: 'Something went wrong!'
   });
 });
 
+const PORT = process.env.PORT || 5001;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'production'}`);
 });
 
 module.exports = app;
