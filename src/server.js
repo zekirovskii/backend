@@ -61,6 +61,7 @@ app.get('/api/health', async (req, res) => {
       message: 'Backend API is running',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'production',
+      runtime: 'nodejs', // Runtime bilgisi eklendi
       database: {
         status: dbStatusText,
         readyState: dbStatus,
