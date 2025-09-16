@@ -4,7 +4,7 @@ require('dotenv').config();
 // MongoDB bağlantısını tekrar aktifleştir
 const connectDB = require('./config/database');
 
-// Route imports - EKLE
+// Route imports
 const projectsRoutes = require('./routes/projects');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/upload');
@@ -34,15 +34,15 @@ app.use((req, res, next) => {
 // Body parsing
 app.use(express.json());
 
-// Static files for uploads - EKLE
+// Static files for uploads
 app.use('/uploads', express.static('uploads'));
 
-// ROUTE REGISTRATIONS - EKLE
+// ROUTE REGISTRATIONS
 app.use('/api/projects', projectsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Health check endpoint - GELİŞTİRİLMİŞ
+// Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
     const mongoose = require('mongoose');
@@ -61,7 +61,6 @@ app.get('/api/health', async (req, res) => {
       message: 'Backend API is running',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV || 'production',
-      runtime: 'nodejs', // Runtime bilgisi eklendi
       database: {
         status: dbStatusText,
         readyState: dbStatus,
@@ -75,46 +74,6 @@ app.get('/api/health', async (req, res) => {
     res.status(500).json({
       status: 'ERROR',
       message: 'Health check failed',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
-});
-
-// Diagnostic endpoint - EKLE
-app.get('/api/diag', async (req, res) => {
-  try {
-    const mongoose = require('mongoose');
-    const dbStatus = mongoose.connection.readyState;
-    
-    let dbStatusText = 'Unknown';
-    switch(dbStatus) {
-      case 0: dbStatusText = 'Disconnected'; break;
-      case 1: dbStatusText = 'Connected'; break;
-      case 2: dbStatusText = 'Connecting'; break;
-      case 3: dbStatusText = 'Disconnecting'; break;
-    }
-
-    res.json({
-      status: 'OK',
-      message: 'Diagnostic endpoint',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'production',
-      runtime: 'nodejs',
-      database: {
-        status: dbStatusText,
-        readyState: dbStatus,
-        host: mongoose.connection.host || 'Not connected',
-        name: mongoose.connection.name || 'Not connected'
-      },
-      uptime: process.uptime(),
-      memory: process.memoryUsage(),
-      ipv4: 'Forced via family: 4'
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'ERROR',
-      message: 'Diagnostic failed',
       error: error.message,
       timestamp: new Date().toISOString()
     });
@@ -160,4 +119,3 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
-    
