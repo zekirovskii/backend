@@ -14,16 +14,25 @@ const PORT = process.env.PORT || 5001;
 // MongoDB bağlantısını başlat
 connectDB();
 
+// Vercel için trust proxy ayarı
+app.set('trust proxy', 1);
+
 // Security middleware - Geçici olarak devre dışı
 // app.use(helmet());
 
-// Rate limiting - Development için gevşetilmiş
+// Rate limiting - Vercel için güncellenmiş
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Development için artırıldı (100'den 1000'e)
+  max: 1000, // Development için artırıldı
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  // Vercel için özel ayarlar
+  trustProxy: true,
+  skip: (req) => {
+    // Health check endpoint'ini rate limit'ten hariç tut
+    return req.path === '/api/health';
+  }
 });
 
 app.use(limiter);
@@ -44,7 +53,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Preflight requests için
-app.options('*', cors());
+app.options('*', cors(corsOptions));
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
