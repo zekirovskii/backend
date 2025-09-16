@@ -1,16 +1,16 @@
 const express = require('express');
 require('dotenv').config();
 
-// MongoDB bağlantısını ekleyelim
-const connectDB = require('./config/database');
+// MongoDB bağlantısını geçici olarak devre dışı bırak
+// const connectDB = require('./config/database');
 
 const app = express();
 
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
-// MongoDB bağlantısını başlat
-connectDB();
+// MongoDB bağlantısını geçici olarak devre dışı bırak
+// connectDB();
 
 // CORS
 app.use((req, res, next) => {
