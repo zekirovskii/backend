@@ -15,9 +15,11 @@ const app = express();
 app.set('trust proxy', 1);
 
 // CORS
+// CORS
 app.use((req, res, next) => {
   const allowedOrigins = [
-    'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app', // Frontend
+    'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app', // Eski frontend
+    'https://portfolio-zekirovskiis-projects.vercel.app', // Yeni frontend
     'https://backend-one-beige-70.vercel.app' // Backend
   ];
   const origin = req.headers.origin;
