@@ -51,6 +51,13 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' })); // URL encoded i
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
 
+// Timeout middleware
+app.use((req, res, next) => {
+  req.setTimeout(30000); // 30 saniye
+  res.setTimeout(30000); // 30 saniye
+  next();
+});
+
 // Database middleware
 const withDB = (router) => [
   async (req, res, next) => {
@@ -116,6 +123,12 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5001;
+const server = require('http').createServer(app);
+
+// Timeout ayarları
+server.timeout = 30000; // 30 saniye
+server.keepAliveTimeout = 30000;
+server.headersTimeout = 31000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);

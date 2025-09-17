@@ -25,13 +25,13 @@ const connectDB = async () => {
     // Eğer bağlantı promise'i varsa, onu bekle
     if (!cached.promise) {
       const opts = {
-        serverSelectionTimeoutMS: 10000,
-        socketTimeoutMS: 45000,
+        serverSelectionTimeoutMS: 5000, // 5 saniye
+        socketTimeoutMS: 30000, // 30 saniye
+        connectTimeoutMS: 10000, // 10 saniye
         bufferCommands: false,
-        family: 4, // IPv4 zorla
+        family: 4,
         useNewUrlParser: true,
         useUnifiedTopology: true
-        // directConnection kaldırdım - SRV URI ile uyumsuz
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
