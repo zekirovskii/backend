@@ -14,8 +14,6 @@ const app = express();
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
-
-
 // CORS
 app.use((req, res, next) => {
   const allowedOrigin = 'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app';
@@ -69,42 +67,16 @@ app.use('/api/projects', ...withDB(projectsRoutes));
 app.use('/api/admin', ...withDB(adminRoutes));
 app.use('/api/upload', ...withDB(uploadRoutes));
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    const mongoose = require('mongoose');
-    const dbStatus = mongoose.connection.readyState;
-    
-    let dbStatusText = 'Unknown';
-    switch(dbStatus) {
-      case 0: dbStatusText = 'Disconnected'; break;
-      case 1: dbStatusText = 'Connected'; break;
-      case 2: dbStatusText = 'Connecting'; break;
-      case 3: dbStatusText = 'Disconnecting'; break;
-    }
-
-    res.json({
-      status: 'OK',
-      message: 'Backend API is running',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'production',
-      database: {
-        status: dbStatusText,
-        readyState: dbStatus,
-        host: mongoose.connection.host || 'Not connected',
-        name: mongoose.connection.name || 'Not connected'
-      },
-      uptime: process.uptime(),
-      memory: process.memoryUsage()
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'ERROR',
-      message: 'Health check failed',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
-  }
+// Health check endpoint - DB bağlantısı olmadan
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    message: 'Backend API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'production',
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
 });
 
 // Root endpoint
