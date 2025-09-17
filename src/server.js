@@ -16,11 +16,14 @@ app.set('trust proxy', 1);
 
 // CORS
 app.use((req, res, next) => {
-  const allowedOrigin = 'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app';
+  const allowedOrigins = [
+    'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app', // Frontend
+    'https://backend-one-beige-70.vercel.app' // Backend
+  ];
   const origin = req.headers.origin;
   
   // Origin kontrolü
-  if (origin === allowedOrigin) {
+  if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   } else if (!origin) {
     // Postman gibi origin olmayan istekler
