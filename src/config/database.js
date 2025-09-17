@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 // Global connection cache
@@ -31,8 +30,8 @@ const connectDB = async () => {
         bufferCommands: false,
         family: 4, // IPv4 zorla
         useNewUrlParser: true,
-        useUnifiedTopology: true,
-        directConnection: true // Non-SRV için
+        useUnifiedTopology: true
+        // directConnection kaldırdım - SRV URI ile uyumsuz
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
