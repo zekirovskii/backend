@@ -42,8 +42,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Body parsing
-app.use(express.json());
+// Body parsing - LIMIT ARTIRILDI
+app.use(express.json({ limit: '50mb' })); // 50MB limit
+app.use(express.urlencoded({ extended: true, limit: '50mb' })); // URL encoded için de limit
 
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
