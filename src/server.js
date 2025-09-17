@@ -19,11 +19,22 @@ connectDB();
 
 // CORS
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  const allowedOrigin = 'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app';
+  const origin = req.headers.origin;
+  
+  // Origin kontrolü
+  if (origin === allowedOrigin) {
+    res.header('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    // Postman gibi origin olmayan istekler
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Max-Age', '86400'); // 24 saat cache
   
-  // OPTIONS request'leri için
+  // OPTIONS request'leri için (preflight)
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -37,10 +48,27 @@ app.use(express.json());
 // Static files for uploads
 app.use('/uploads', express.static('uploads'));
 
-// ROUTE REGISTRATIONS
-app.use('/api/projects', projectsRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/upload', uploadRoutes);
+// Database middleware
+const withDB = (router) => [
+  async (req, res, next) => {
+    try {
+      await connectDB();
+      next();
+    } catch (e) {
+      console.error('DB connection error:', e.message);
+      res.status(500).json({ 
+        status: 'error', 
+        message: 'Database connection failed' 
+      });
+    }
+  },
+  router
+];
+
+// ROUTE REGISTRATIONS - Database middleware ile
+app.use('/api/projects', ...withDB(projectsRoutes));
+app.use('/api/admin', ...withDB(adminRoutes));
+app.use('/api/upload', ...withDB(uploadRoutes));
 
 // Health check endpoint
 app.get('/api/health', async (req, res) => {

@@ -66,6 +66,15 @@ router.post('/login', async (req, res) => {
       });
     }
 
+    // JWT_SECRET kontrolü
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not set in environment variables');
+      return res.status(500).json({
+        status: 'error',
+        message: 'Server configuration error'
+      });
+    }
+
     // Find admin by username or email
     const admin = await Admin.findOne({
       $or: [{ username }, { email: username }],
@@ -114,6 +123,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Login error:', error.message);
     res.status(500).json({
       status: 'error',
       message: 'Failed to login',
