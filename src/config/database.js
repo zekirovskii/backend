@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const { ServerApiVersion } = require('mongodb');
 
 // Global connection cache
 let cached = global.mongoose;
@@ -26,12 +27,18 @@ const connectDB = async () => {
     // Eğer bağlantı promise'i varsa, onu bekle
     if (!cached.promise) {
       const opts = {
-        serverSelectionTimeoutMS: 10000, // 10 saniye timeout
-        socketTimeoutMS: 45000, // 45 saniye socket timeout
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
         bufferCommands: false,
         family: 4, // IPv4 zorla
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        // MongoDB Atlas Stable API
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        }
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
@@ -80,8 +87,6 @@ const connectDB = async () => {
       console.error('   - Verify database user has proper permissions');
     }
     
-    // Vercel'de process.exit(1) kullanma!
-    // Sadece error'u throw et
     throw error;
   }
 };
