@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 require('dotenv').config();
 
 // MongoDB bağlantısını tekrar aktifleştir
@@ -14,35 +15,13 @@ const app = express();
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
-// CORS
-// CORS
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://portfolio-kappa-sepia-4apso6ftjs.vercel.app', // Eski frontend
-    'https://portfolio-zekirovskiis-projects.vercel.app', // Yeni frontend
-    'https://backend-one-beige-70.vercel.app' // Backend
-  ];
-  const origin = req.headers.origin;
-  
-  // Origin kontrolü
-  if (allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else if (!origin) {
-    // Postman gibi origin olmayan istekler
-    res.header('Access-Control-Allow-Origin', '*');
-  }
-  
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.header('Access-Control-Max-Age', '86400'); // 24 saat cache
-  
-  // OPTIONS request'leri için (preflight)
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
+// CORS - Tüm origin'lere izin ver
+app.use(cors({
+  origin: '*', // Tüm origin'lere izin ver
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false // Cookie kullanmıyorsan false
+}));
 
 // Body parsing - LIMIT ARTIRILDI
 app.use(express.json({ limit: '50mb' })); // 50MB limit
@@ -58,11 +37,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// Database middleware
+// Database middleware - HIZLI BAĞLANTI
 const withDB = (router) => [
   async (req, res, next) => {
     try {
-      await connectDB();
+      // Eğer zaten bağlıysa, hemen geç
+      if (global.mongoose?.conn) {
+        return next();
+      }
+      
+      // Hızlı bağlantı - timeout kısa
+      await Promise.race([
+        connectDB(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('DB connection timeout')), 5000)
+        )
+      ]);
+      
       next();
     } catch (e) {
       console.error('DB connection error:', e.message);
