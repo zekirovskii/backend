@@ -1,26 +1,11 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const router = express.Router();
 const auth = require('../middleware/auth');
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Vercel için memory storage kullan
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   // Accept only image files
@@ -56,16 +41,19 @@ router.post('/image', auth, upload.single('image'), (req, res) => {
       });
     }
 
-    const imageUrl = getFullUrl(req, req.file.filename);
+    // Vercel'de dosya yazma yapamayız, sadece base64 döndürüyoruz
+    const base64 = req.file.buffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
     
     res.json({
       status: 'success',
       message: 'Image uploaded successfully',
       data: {
-        filename: req.file.filename,
+        filename: `image-${Date.now()}-${Math.round(Math.random() * 1E9)}.jpg`,
         originalName: req.file.originalname,
         size: req.file.size,
-        url: imageUrl // Full URL döndürüyoruz
+        url: dataUrl, // Base64 data URL
+        base64: base64
       }
     });
   } catch (error) {
@@ -87,12 +75,18 @@ router.post('/images', auth, upload.array('images', 10), (req, res) => {
       });
     }
 
-    const uploadedImages = req.files.map(file => ({
-      filename: file.filename,
-      originalName: file.originalname,
-      size: file.size,
-      url: getFullUrl(req, file.filename) // Full URL döndürüyoruz
-    }));
+    const uploadedImages = req.files.map(file => {
+      const base64 = file.buffer.toString('base64');
+      const dataUrl = `data:${file.mimetype};base64,${base64}`;
+      
+      return {
+        filename: `image-${Date.now()}-${Math.round(Math.random() * 1E9)}.jpg`,
+        originalName: file.originalname,
+        size: file.size,
+        url: dataUrl, // Base64 data URL
+        base64: base64
+      };
+    });
     
     res.json({
       status: 'success',
