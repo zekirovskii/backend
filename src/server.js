@@ -14,8 +14,7 @@ const app = express();
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
-// MongoDB bağlantısını başlat
-connectDB();
+
 
 // CORS
 app.use((req, res, next) => {
