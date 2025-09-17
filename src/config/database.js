@@ -29,7 +29,9 @@ const connectDB = async () => {
         serverSelectionTimeoutMS: 10000, // 10 saniye timeout
         socketTimeoutMS: 45000, // 45 saniye socket timeout
         bufferCommands: false,
-        family: 4 // IPv4 kullanmaya zorla - Vercel için kritik!
+        family: 4, // IPv4 zorla
+        useNewUrlParser: true,
+        useUnifiedTopology: true
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
