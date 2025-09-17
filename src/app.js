@@ -6,6 +6,9 @@ const app = express();
 // Vercel için trust proxy ayarı
 app.set('trust proxy', 1);
 
+// --- MongoDB bağlantısını başlat ---
+connectDB();   // ✅ uygulama ayağa kalkarken 1 kez bağlanır
+
 // CORS
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -38,12 +41,12 @@ app.use('/api/upload', uploadRoutes);
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
-    const m = await connectDB();
+    const mongoose = require('mongoose');
     res.json({ 
       ok: true, 
-      db: m.connection.name, 
-      state: m.connection.readyState,
-      host: m.connection.host,
+      db: mongoose.connection.name, 
+      state: mongoose.connection.readyState,
+      host: mongoose.connection.host,
       timestamp: new Date().toISOString()
     });
   } catch (e) { 
