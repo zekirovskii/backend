@@ -1,6 +1,5 @@
 
 const mongoose = require('mongoose');
-const { ServerApiVersion } = require('mongodb');
 
 // Global connection cache
 let cached = global.mongoose;
@@ -33,12 +32,7 @@ const connectDB = async () => {
         family: 4, // IPv4 zorla
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        // MongoDB Atlas Stable API
-        serverApi: {
-          version: ServerApiVersion.v1,
-          strict: true,
-          deprecationErrors: true,
-        }
+        directConnection: true // Non-SRV için
       };
 
       cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
