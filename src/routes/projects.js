@@ -96,8 +96,7 @@ router.post('/', auth, validateProject, async (req, res) => {
       liveUrl: req.body.liveUrl || undefined,
       featured: req.body.featured || false,
       status: statusMapping[req.body.status] || 'draft',
-      images: req.body.image ? [req.body.image] : [], // images array
-      image: req.body.image || undefined // image field da ekle
+      image: req.body.image || undefined // Sadece image field
     };
     
     console.log(' Processed project data:', JSON.stringify(projectData, null, 2));

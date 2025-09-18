@@ -18,10 +18,10 @@ const projectSchema = new mongoose.Schema({
     required: true,
     trim: true
   }],
-  images: [{
-    type: String, // URL to image
+  image: {  // Sadece image field
+    type: String,
     required: false
-  }],
+  },
   githubUrl: {
     type: String,
     required: false,
