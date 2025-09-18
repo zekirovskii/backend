@@ -9,6 +9,7 @@ const connectDB = require('./config/database');
 const projectsRoutes = require('./routes/projects');
 const adminRoutes = require('./routes/admin');
 const uploadRoutes = require('./routes/upload');
+const mailRoutes = require('./routes/mail'); // YENİ
 
 const app = express();
 
@@ -70,6 +71,7 @@ const withDB = (router) => [
 app.use('/api/projects', ...withDB(projectsRoutes));
 app.use('/api/admin', ...withDB(adminRoutes));
 app.use('/api/upload', ...withDB(uploadRoutes));
+app.use('/api/mail', mailRoutes); // YENİ - Database gerektirmez
 
 // Health check endpoint - DB bağlantısı olmadan
 app.get('/api/health', (req, res) => {
