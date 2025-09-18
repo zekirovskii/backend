@@ -13,13 +13,17 @@ const mailRoutes = require('./routes/mail');
 
 const app = express();
 
-// CORS - Tüm origin'lere izin ver
+// CORS - Daha güçlü ayarlar
 app.use(cors({
   origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: false
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  credentials: false,
+  optionsSuccessStatus: 200
 }));
+
+// OPTIONS request'leri için özel handler
+app.options('*', cors());
 
 // Body parsing
 app.use(express.json({ limit: '50mb' }));
