@@ -7,7 +7,7 @@ const { validateProject } = require('../middleware/validation');
 // GET /api/projects - Get all published projects
 router.get('/', async (req, res) => {
   try {
-    const { featured, limit = 10, page = 1 } = req.query;
+    const { featured, limit = 50, page = 1 } = req.query; // 10 → 50
     
     const query = { status: 'published' };
     if (featured === 'true') {
