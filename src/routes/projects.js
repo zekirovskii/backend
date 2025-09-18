@@ -92,11 +92,12 @@ router.post('/', auth, validateProject, async (req, res) => {
       title: req.body.title,
       description: req.body.description,
       technologies: req.body.technologies,
-      githubUrl: req.body.githubUrl || undefined, // Boş string yerine undefined
-      liveUrl: req.body.liveUrl || undefined,     // Boş string yerine undefined
+      githubUrl: req.body.githubUrl || undefined,
+      liveUrl: req.body.liveUrl || undefined,
       featured: req.body.featured || false,
-      status: statusMapping[req.body.status] || 'draft', // Status mapping
-      images: req.body.image ? [req.body.image] : [] // image'i images array'ine çevir
+      status: statusMapping[req.body.status] || 'draft',
+      images: req.body.image ? [req.body.image] : [], // images array
+      image: req.body.image || undefined // image field da ekle
     };
     
     console.log(' Processed project data:', JSON.stringify(projectData, null, 2));
