@@ -96,7 +96,8 @@ router.post('/', auth, validateProject, async (req, res) => {
       liveUrl: req.body.liveUrl || undefined,
       featured: req.body.featured || false,
       status: statusMapping[req.body.status] || 'draft',
-      image: req.body.image || undefined // Sadece image field
+      images: req.body.image ? [req.body.image] : [], // images array
+      image: req.body.image || undefined // image field da ekle
     };
     
     console.log(' Processed project data:', JSON.stringify(projectData, null, 2));
@@ -132,12 +133,12 @@ router.put('/:id', auth, validateProject, async (req, res) => {
     
     // Status mapping - Frontend'den gelen status'u backend enum'ına çevir
     const statusMapping = {
-  'Completed': 'Completed',      // Completed → Completed
-  'In Progress': 'In Progress',  // In Progress → In Progress
-  'Archived': 'Archived',        // Archived → Archived
-  'Draft': 'Draft',              // Draft → Draft
-  'Published': 'Published'       // Published → Published
-};
+      'Completed': 'published',
+      'In Progress': 'draft',
+      'Archived': 'archived',
+      'Draft': 'draft',
+      'Published': 'published'
+    };
     
     // Frontend verisini backend schema'ya uygun hale getir
     const updateData = {
@@ -147,15 +148,16 @@ router.put('/:id', auth, validateProject, async (req, res) => {
       githubUrl: req.body.githubUrl || undefined,
       liveUrl: req.body.liveUrl || undefined,
       featured: req.body.featured || false,
-      status: statusMapping[req.body.status] || req.body.status // Direkt status'u da kabul et
+      status: statusMapping[req.body.status] || req.body.status,
+      image: req.body.image || undefined // Sadece image field
     };
     
-    // Resim güncelleme - Frontend'den gelen image field'ını images array'ine çevir
-    if (req.body.image) {
-      updateData.images = [req.body.image];
-    } else if (req.body.images) {
-      updateData.images = req.body.images;
-    }
+    // Undefined değerleri temizle
+    Object.keys(updateData).forEach(key => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
     
     console.log('🔄 Processed update data:', JSON.stringify(updateData, null, 2));
     
